@@ -187,7 +187,7 @@ func (c *Client) DeleteIPAddress(ctx context.Context, id string) (*DeleteIPAddre
 }
 
 // GetIPAddresses returns a list of IP Addresses by node id
-func (c *Client) GetIPAddresses(ctx context.Context, nodeID string) (*GetIPAddressesByNode, error) {
+func (c *Client) GetIPAddresses(ctx context.Context, nodeID string) (*GetLoadBalancer, error) {
 	_, err := gidx.Parse(nodeID)
 	if err != nil {
 		return nil, err
@@ -197,10 +197,10 @@ func (c *Client) GetIPAddresses(ctx context.Context, nodeID string) (*GetIPAddre
 		"id": nodeID,
 	}
 
-	var ipas GetIPAddressesByNode
-	if err := c.gqlCli.Query(ctx, &ipas, vars); err != nil {
+	var lb GetLoadBalancer
+	if err := c.gqlCli.Query(ctx, &lb, vars); err != nil {
 		return nil, err
 	}
 
-	return &ipas, nil
+	return &lb, nil
 }

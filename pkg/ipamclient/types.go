@@ -101,14 +101,33 @@ type DeleteIPAddressResult struct {
 	DeletedID string `graphql:"deletedID"`
 }
 
-// IPAddressableFragment fragment for getting IP Addresses by node
-type IPAddressableFragment struct {
-	IPAddresses []IPAddressNode `graphql:"IPAddresses"`
+// OwnerNode owner id
+type OwnerNode struct {
+	ID string
 }
 
-// GetIPAddressesByNode query for getting IP Addresses by node
-type GetIPAddressesByNode struct {
-	Entities []struct {
-		IPAddressableFragment `graphql:"... on IPAddressable"`
-	} `graphql:"_entities(representations: {__typename:\"IPAddressable\", id:$id})"`
+// LocationNode location id
+type LocationNode struct {
+	ID string
+}
+
+// LoadBalancer gql representation of a loadbalancer
+type LoadBalancer struct {
+	ID          string
+	Name        string
+	Owner       OwnerNode
+	Location    LocationNode
+	IPAddresses []IPAddress `graphql:"IPAddresses" json:"IPAddresses"`
+}
+
+// GetLoadBalancer query used for getting a loadbalancer
+type GetLoadBalancer struct {
+	LoadBalancer LoadBalancer `graphql:"loadBalancer(id: $id)"`
+}
+
+// IPAddress gql representation of an ip address
+type IPAddress struct {
+	ID       string
+	IP       string
+	Reserved bool
 }

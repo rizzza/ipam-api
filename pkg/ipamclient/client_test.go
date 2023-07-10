@@ -161,8 +161,9 @@ func TestGetIPAddressesByNodeID(t *testing.T) {
 	cli := Client{
 		gqlCli: mustNewGQLTestClient(`{
   "data": {
-    "_entities": [
-      {
+      "loadBalancer": {
+        "id": "loadbal-randovalue",
+		"name": "loadbalancer-test",
         "IPAddresses": [
           {
             "id": "ipamipa-8IPzP37YJ1iTxJdMrCods",
@@ -176,7 +177,6 @@ func TestGetIPAddressesByNodeID(t *testing.T) {
           }
         ]
       }
-    ]
   }
 }`),
 	}
@@ -187,21 +187,18 @@ func TestGetIPAddressesByNodeID(t *testing.T) {
 		require.Nil(t, ips)
 	})
 
-	t.Run("retrieves nodeID ip addresses", func(t *testing.T) {
-		ips, err := cli.GetIPAddresses(context.Background(), "loadbal-randovalue")
+	t.Run("retrieves loadbalancer with ip addresses", func(t *testing.T) {
+		lb, err := cli.GetIPAddresses(context.Background(), "loadbal-randovalue")
 		require.NoError(t, err)
-		require.NotNil(t, ips)
+		require.NotNil(t, lb)
 
-		require.Len(t, ips.Entities, 1)
-		require.Len(t, ips.Entities[0].IPAddresses, 2)
+		assert.Equal(t, "ipamipa-8IPzP37YJ1iTxJdMrCods", lb.LoadBalancer.IPAddresses[0].ID)
+		assert.Equal(t, "192.168.1.142", lb.LoadBalancer.IPAddresses[0].IP)
+		assert.False(t, lb.LoadBalancer.IPAddresses[0].Reserved)
 
-		assert.Equal(t, "ipamipa-8IPzP37YJ1iTxJdMrCods", ips.Entities[0].IPAddresses[0].ID)
-		assert.Equal(t, "192.168.1.142", ips.Entities[0].IPAddresses[0].IP)
-		assert.False(t, ips.Entities[0].IPAddresses[0].Reserved)
-
-		assert.Equal(t, "ipamipa-rPBY83fPw6Ll5sueCMpDr", ips.Entities[0].IPAddresses[1].ID)
-		assert.Equal(t, "192.168.1.1", ips.Entities[0].IPAddresses[1].IP)
-		assert.True(t, ips.Entities[0].IPAddresses[1].Reserved)
+		assert.Equal(t, "ipamipa-rPBY83fPw6Ll5sueCMpDr", lb.LoadBalancer.IPAddresses[1].ID)
+		assert.Equal(t, "192.168.1.1", lb.LoadBalancer.IPAddresses[1].IP)
+		assert.True(t, lb.LoadBalancer.IPAddresses[1].Reserved)
 	})
 }
 
